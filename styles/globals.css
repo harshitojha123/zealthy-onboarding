@@ -1,0 +1,181 @@
+/* styles/globals.css — premium glass UI, no Tailwind needed */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+
+:root {
+  --bg: #090b12;
+  --bg-2: #0e1426;
+  --card: rgba(13, 18, 33, 0.7);
+  --text: #e6edf7;
+  --muted: #9aa4b2;
+  --border: rgba(255,255,255,.08);
+  --accent: #7c5cff;
+  --accent-2: #22d3ee;
+  --ring: #8b5cf6;
+  --danger: #fda4af;
+  --radius: 16px;
+  --shadow-outer: 0 12px 40px rgba(2, 6, 23, .45);
+  --shadow-inner: inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  color: var(--text);
+  background:
+    radial-gradient(900px 600px at 10% -10%, rgba(34,211,238,.15), transparent 60%),
+    radial-gradient(900px 600px at 90% -20%, rgba(124,92,246,.22), transparent 60%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  min-height: 100vh;
+}
+
+/* Shell + animated auras */
+.container { max-width: 980px; margin: 0 auto; padding: 36px 20px 72px; position: relative; }
+.shell { position: relative; isolation: isolate; }
+.aura {
+  position: absolute; inset: -80px -40px auto auto;
+  width: 520px; height: 520px; filter: blur(70px); opacity: .28;
+  background: radial-gradient(circle at 30% 30%, var(--accent), transparent 60%),
+              radial-gradient(circle at 70% 70%, var(--accent-2), transparent 60%);
+  border-radius: 50%;
+  animation: float 12s ease-in-out infinite;
+  z-index: -1;
+}
+.aura.a2 {
+  inset: auto auto -120px -40px; width: 620px; height: 620px;
+  opacity: .22; animation-duration: 16s;
+}
+@keyframes float {
+  0%,100% { transform: translateY(0) translateX(0) scale(1); }
+  50% { transform: translateY(-12px) translateX(8px) scale(1.02); }
+}
+
+/* Heading */
+.header {
+  font-size: 38px; font-weight: 800; letter-spacing: .2px; margin: 8px 0 14px;
+  background: linear-gradient(90deg, #fff, #c7d2fe 50%, #a5f3fc);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* Glass card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-outer), var(--shadow-inner);
+  padding: 26px;
+  backdrop-filter: blur(10px);
+}
+
+/* Stepper chips */
+.stepper { display:flex; gap:10px; flex-wrap:wrap; margin: 8px 0 18px; }
+.chip {
+  display:inline-flex; align-items:center; gap:8px;
+  padding: 8px 12px; border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border: 1px solid var(--border);
+  font-size: 12px; color: var(--text);
+}
+.chip .num {
+  width: 22px; height: 22px; border-radius: 999px; display:grid; place-items:center;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #0b1220; font-weight: 800; font-size: 11px;
+}
+
+/* Progress bar */
+.progress {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin: 8px 0 18px;
+}
+.progress__bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 24px rgba(124,92,246,.6);
+  transition: width .4s cubic-bezier(.22,.61,.36,1);
+}
+.progress__label {
+  display: block; margin-top: 6px; font-size: 12px; color: var(--muted);
+}
+
+/* Sections + grids */
+.section { margin: 18px 0 6px; }
+.section h2 { margin: 0 0 10px; font-size: 18px; font-weight: 700; }
+.grid { display:grid; gap: 12px; }
+.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.row { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.label { display:block; font-size: 12px; color: var(--muted); margin: 2px 0 6px; }
+
+/* Inputs */
+.input, .textarea {
+  width:100%; border: 1px solid var(--border); background: #0b1220;
+  color: var(--text); border-radius: 12px; padding: 12px 14px; outline: none;
+  transition: box-shadow .2s ease, border-color .2s ease, transform .02s ease-in;
+}
+.textarea { min-height: 120px; resize: vertical; }
+.input::placeholder, .textarea::placeholder { color: #6b7280; }
+.input:focus, .textarea:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px rgba(124,92,246,.35);
+}
+
+/* Buttons */
+.button {
+  display:inline-flex; justify-content:center; align-items:center;
+  padding: 12px 16px; font-weight: 800; letter-spacing:.2px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color:#0b1220; border: none; border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(124,92,246,.45), inset 0 1px 0 rgba(255,255,255,.25);
+  cursor:pointer; transition: transform .05s ease, filter .15s ease;
+}
+.button:hover { transform: translateY(-1px); filter: saturate(1.08); }
+.button:active { transform: translateY(0); }
+.button[disabled] { opacity:.6; cursor:not-allowed; }
+
+.helper { color: var(--muted); font-size: 12px; margin-top: 4px; }
+.error  { color: var(--danger); font-size: 13px; }
+
+/* Toast */
+.toast {
+  position: fixed; right: 18px; bottom: 18px;
+  background: rgba(16,24,40,.9); color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px; z-index: 50;
+  box-shadow: var(--shadow-outer);
+  opacity: 0; transform: translateY(6px);
+  animation: toast-in .28s ease forwards;
+}
+@keyframes toast-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pretty toggle for admin */
+.toggle {
+  appearance: none;
+  width: 44px; height: 26px; border-radius: 999px;
+  background: #111827; border: 1px solid var(--border);
+  position: relative; cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
+}
+.toggle::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 20px; height: 20px; border-radius: 999px; background: #e5e7eb;
+  transition: transform .2s ease, background .2s ease;
+}
+.toggle:checked {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+}
+.toggle:checked::after { transform: translateX(18px); background: #0b1220; }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .aura, .aura.a2 { animation: none; }
+  .button, .progress__bar { transition: none; }
+}

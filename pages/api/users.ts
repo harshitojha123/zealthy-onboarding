@@ -1,55 +1,47 @@
 // pages/api/users.ts
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { v4 as uuidv4 } from 'uuid'
+import type { NextApiRequest, NextApiResponse } from "next";
+import { prisma } from "../../lib/prisma";
 
-type User = {
-  id: string
-  email: string
-  password: string
-  about?: string
-  street?: string
-  city?: string
-  state?: string
-  zip?: string
-  birthDate?: string
-}
+type Row = {
+  id: number;
+  email: string;
+  about: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  birthDate: string; // YYYY-MM-DD or ""
+  onboardStep: number;
+};
 
-// simple in-memory store
-let usersStore: User[] = []
+type Resp = { users: Row[] } | { message: string };
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<User[] | { message: string }>
+  res: NextApiResponse<Resp>
 ) {
-  if (req.method === 'GET') {
-    return res.status(200).json(usersStore)
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  if (req.method === 'POST') {
-    const body = req.body as Partial<User>
-    let user = usersStore.find(u => u.email === body.email)
+  try {
+    const users = await prisma.user.findMany({ orderBy: { id: "asc" } });
 
-    // create or update
-    if (!user) {
-      user = {
-        id: uuidv4(),
-        email: body.email!,
-        password: body.password!,
-        about: body.about,
-        street: body.street,
-        city: body.city,
-        state: body.state,
-        zip: body.zip,
-        birthDate: body.birthDate,
-      }
-      usersStore.push(user)
-    } else {
-      Object.assign(user, body)
-    }
+    const rows: Row[] = users.map((u) => ({
+      id: u.id,
+      email: u.email,
+      about: u.about ?? "",
+      street: u.street ?? "",
+      city: u.city ?? "",
+      state: u.state ?? "",
+      zip: u.zip ?? "",
+      birthDate: u.birthDate ? u.birthDate.toISOString().slice(0, 10) : "",
+      onboardStep: u.onboardStep,
+    }));
 
-    return res.status(200).json(usersStore)
+    return res.status(200).json({ users: rows });
+  } catch (e: any) {
+    return res.status(500).json({ message: e?.message || "Failed to load users" });
   }
-
-  res.setHeader('Allow', ['GET', 'POST'])
-  res.status(405).json({ message: 'Method Not Allowed' })
 }

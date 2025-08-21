@@ -1,3 +1,4 @@
+// prisma/schema.prisma
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
@@ -8,8 +9,8 @@ generator client {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
   password    String
   about       String?
   street      String?
@@ -17,11 +18,14 @@ model User {
   state       String?
   zip         String?
   birthDate   DateTime?
-  onboardStep Int      @default(1)
+  onboardStep Int       @default(1)
 }
 
 model ComponentConfig {
   id         Int    @id @default(autoincrement())
   pageNumber Int
   component  String
+
+  @@unique([pageNumber, component])  // 👈 prevent duplicate components per page
+  @@index([pageNumber])              // (optional) faster page loads
 }

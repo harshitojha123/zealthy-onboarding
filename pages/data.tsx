@@ -1,52 +1,112 @@
+// pages/data.tsx
+import * as React from "react";
 import useSWR from "swr";
 
-type User = {
-  id: string;
+type Row = {
+  id: number | string;
   email: string;
-  about?: string;
-  street?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  birthDate?: string;
+  about: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  birthDate: string; // YYYY-MM-DD or ""
+  onboardStep: number;
 };
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+type Api = { users: Row[] };
+
+const fetcher = (url: string) =>
+  fetch(url, { cache: "no-store" }).then(async (r) => {
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  });
 
 export default function DataPage() {
-  const { data: users, error } = useSWR<User[]>("/api/users", fetcher);
-
-  if (error) return <p>Failed to load users.</p>;
-  if (!users) return <p>Loading…</p>;
+  const { data, error, isLoading, mutate } = useSWR<Api>("/api/users", fetcher);
 
   return (
-    <table
-      border={1}
-      cellPadding={5}
-      style={{ margin: "20px auto", borderCollapse: "collapse" }}
-    >
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>About</th>
-          <th>Address</th>
-          <th>Birth Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        {users.map((u) => (
-          <tr key={u.id}>
-            <td>{u.email}</td>
-            <td>{u.about || "-"}</td>
-            <td>
-              {u.street
-                ? `${u.street}, ${u.city}, ${u.state} ${u.zip}`
-                : "-"}
-            </td>
-            <td>{u.birthDate ? u.birthDate.slice(0, 10) : "-"}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className="container shell">
+      <div className="aura" /><div className="aura a2" />
+      <h1 className="header">Data (no auth)</h1>
+
+      <div className="card">
+        <p className="helper" style={{ marginTop: 0 }}>
+          Simple read-only table of rows in the <code>User</code> table. Refresh this
+          page after each step to see new data persist.
+        </p>
+
+        <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+          <button className="button" onClick={() => mutate()}>
+            Refresh
+          </button>
+        </div>
+
+        {isLoading && <p className="helper">Loading…</p>}
+        {error && <p className="error">Failed to load: {String((error as any)?.message || error)}</p>}
+
+        {!isLoading && !error && (
+          <>
+            {data && data.users.length === 0 ? (
+              <p className="helper">No users yet. Submit the onboarding form to create one.</p>
+            ) : (
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      {[
+                        "ID",
+                        "Email",
+                        "About",
+                        "Street",
+                        "City",
+                        "State",
+                        "ZIP",
+                        "Birthdate",
+                        "Onboard Step",
+                      ].map((h) => (
+                        <th
+                          key={h}
+                          style={{
+                            textAlign: "left",
+                            padding: "10px",
+                            borderBottom: "1px solid var(--border)",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data?.users.map((u) => (
+                      <tr key={u.id}>
+                        <td style={td}>{u.id}</td>
+                        <td style={td}>{u.email}</td>
+                        <td style={td}>{u.about}</td>
+                        <td style={td}>{u.street}</td>
+                        <td style={td}>{u.city}</td>
+                        <td style={td}>{u.state}</td>
+                        <td style={td}>{u.zip}</td>
+                        <td style={td}>{u.birthDate || "—"}</td>
+                        <td style={td}>{u.onboardStep}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
   );
 }
+
+const td: React.CSSProperties = {
+  padding: "10px",
+  borderBottom: "1px solid var(--border)",
+  verticalAlign: "top",
+  whiteSpace: "nowrap",
+};
