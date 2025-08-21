@@ -5,16 +5,18 @@ import { FormProvider, useForm } from "react-hook-form";
 import "../styles/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {
-  // One RHF instance shared across all pages so values persist between steps/routes
   const form = useForm({ mode: "onBlur" });
 
   return (
     <SWRConfig
       value={{
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
+        // ✅ re-fetch when the page/tab regains focus or comes back online
+        revalidateOnFocus: true,
+        revalidateOnReconnect: true,
+
+        // keep these if you like; they don’t block revalidation on focus
         dedupingInterval: 5000,
-        focusThrottleInterval: 5000,
+        focusThrottleInterval: 500,
       }}
     >
       <FormProvider {...form}>
